@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
 import { FaSistrix } from 'react-icons/fa';
+import PropTypes from 'prop-types';
+
 
 import {
   SearchbarSection,
@@ -66,3 +68,7 @@ export default class Searchbar extends Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+  formSubmitHandler: PropTypes.func.isRequired,
+};
