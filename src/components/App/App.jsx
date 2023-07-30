@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect, useRef } from 'react';
+import React, {  useState, useEffect, useRef } from 'react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,16 +16,19 @@ export default function App(){
   const [searchQuery, setSearchQuery] = useState('')
     const [galleryItems, setGalleryItems] = useState([])
   const [galleryPage, setGalleryPage] = useState(1)
-  const [hitsPerPage, setHitsPerPage] = useState(12)
+  // const [hitsPerPage, setHitsPerPage] = useState(12)
   const [loading, setLoading] = useState(false)
   const [isButtonShow, setIsButtonShow] = useState(false)
   const [error, setError] = useState(true)
 
   const isFirstRender = useRef(true) 
+   const hitsPerPage = useRef(12) 
 
 useEffect(()=>{
-if (isFirstRender.current){
-  console.log(isFirstRender.current)
+    console.log('isFirstRender.current', searchQuery)
+
+if (searchQuery){
+  console.log(searchQuery)
 
   isFirstRender.current = false
 
