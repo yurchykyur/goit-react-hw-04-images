@@ -1,40 +1,66 @@
-import { Component } from 'react';
+import {  useState } from 'react';
 import PropTypes from 'prop-types';
 
 
 import { GalleryItem, GalleryImg } from './ImageGalleryItem.styled';
 import Modal from 'components/Modal';
 
-export default class ImageGalleryItem extends Component {
-  state = {
-    isModalOpen: false,
-  };
+export default function ImageGalleryItem(props){
+const [isModalOpen, setIsModalOpen] = useState(false)
 
-  toggleModal = () => {
-    this.setState(({ isModalOpen }) => ({ isModalOpen: !isModalOpen }));
-  };
+ const toggleModal = () => {
+    setIsModalOpen(!isModalOpen)
+  }
 
-  render() {
-    const {
+  const {
       galleryItem: { webformatURL, largeImageURL, tags },
-    } = this.props;
-
-    return (
+    } = props;
+  return (
       <>
-        <GalleryItem className="gallery-item" onClick={this.toggleModal}>
+        <GalleryItem className="gallery-item" onClick={toggleModal}>
           <GalleryImg src={webformatURL} alt={tags} />
         </GalleryItem>
-        {this.state.isModalOpen && (
+        {isModalOpen && (
           <Modal
             largeImageURL={largeImageURL}
             alt={tags}
-            onCloseModal={this.toggleModal}
+            onCloseModal={() => toggleModal()}
           />
         )}
       </>
     );
-  }
 }
+
+//  class OldImageGalleryItem extends Component {
+//   state = {
+//     isModalOpen: false,
+//   };
+
+//   toggleModal = () => {
+//     this.setState(({ isModalOpen }) => ({ isModalOpen: !isModalOpen }));
+//   };
+
+//   render() {
+//     const {
+//       galleryItem: { webformatURL, largeImageURL, tags },
+//     } = this.props;
+
+//     return (
+//       <>
+//         <GalleryItem className="gallery-item" onClick={this.toggleModal}>
+//           <GalleryImg src={webformatURL} alt={tags} />
+//         </GalleryItem>
+//         {this.state.isModalOpen && (
+//           <Modal
+//             largeImageURL={largeImageURL}
+//             alt={tags}
+//             onCloseModal={this.toggleModal}
+//           />
+//         )}
+//       </>
+//     );
+//   }
+// }
 
 ImageGalleryItem.propTypes = {
   galleryItem: PropTypes.shape({
