@@ -27,7 +27,7 @@ export default function App(){
 useEffect(()=>{
     console.log('isFirstRender.current', searchQuery)
 
-if (searchQuery){
+if (!searchQuery){
   console.log(searchQuery)
 
   isFirstRender.current = false
@@ -35,7 +35,7 @@ if (searchQuery){
   return;
 }
 
-console.log(isFirstRender.current)
+console.log(searchQuery)
 
   function fetchGalleryItems  (nextQuery, nextPage, hitsPerPage)  {
 
@@ -70,6 +70,13 @@ console.log(isFirstRender.current)
         );
   
         setGalleryItems(prevState => [...prevState, ...newData])
+        console.log(galleryPage < Math.ceil(totalHits / hitsPerPage.current))
+        console.log(galleryPage )
+        console.log( Math.ceil(totalHits / hitsPerPage))
+        console.log( totalHits)
+        console.log(  hitsPerPage)
+
+
         setIsButtonShow(galleryPage < Math.ceil(totalHits / hitsPerPage))
        
      
@@ -92,7 +99,7 @@ console.log(isFirstRender.current)
   setSearchQuery(searchQuery)
   setGalleryPage(1)
   setGalleryItems([])
-  isButtonShow(false)
+  setIsButtonShow(false)
 
  
   };
