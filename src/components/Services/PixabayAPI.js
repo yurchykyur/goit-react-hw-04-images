@@ -1,13 +1,14 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
-
 export default async function servicePixabayAPI(
   searchQuery,
   page,
   hitsPerPage
 ) {
   const API_KEY = '36923827-7e58aafe5e36d67095a3a9316';
+
+  console.log('hitsPerPage', hitsPerPage);
 
   const config = {
     method: 'get',

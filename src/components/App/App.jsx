@@ -1,4 +1,4 @@
-import React, {  useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,217 +12,91 @@ import servicePixabayAPI from 'components/Services/PixabayAPI';
 
 import { AppContent } from './App.styled';
 
-export default function App(){
-  const [searchQuery, setSearchQuery] = useState('')
-    const [galleryItems, setGalleryItems] = useState([])
-  const [galleryPage, setGalleryPage] = useState(1)
-  // const [hitsPerPage, setHitsPerPage] = useState(12)
-  const [loading, setLoading] = useState(false)
-  const [isButtonShow, setIsButtonShow] = useState(false)
-  const [error, setError] = useState(true)
+export default function App() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [galleryPage, setGalleryPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [isButtonShow, setIsButtonShow] = useState(false);
+  const [error, setError] = useState(true);
 
-  const isFirstRender = useRef(true) 
-   const hitsPerPage = useRef(12) 
+  const hitsPerPage = useRef(12);
 
-useEffect(()=>{
-    console.log('isFirstRender.current', searchQuery)
+  useEffect(() => {
+    if (!searchQuery) {
+      return;
+    }
 
-if (!searchQuery){
-  console.log(searchQuery)
+    function fetchGalleryItems(nextQuery, nextPage, hitsPerPage) {
+      setLoading(true);
+      setError(false);
 
-  isFirstRender.current = false
+      servicePixabayAPI(nextQuery, nextPage, hitsPerPage.current)
+        .then(data => {
+          const { totalHits, hits } = data;
 
-  return;
-}
+          if (!totalHits) {
+            setLoading(false);
+            setError(true);
+            toast.warn(
+              'Sorry, there are no images matching your search query. Please try again.'
+            );
+            return;
+          }
 
-console.log(searchQuery)
+          if (nextPage === 1 || totalHits <= hitsPerPage) {
+            toast.success(`Hooray! We found ${totalHits} images.`);
+          }
 
-  function fetchGalleryItems  (nextQuery, nextPage, hitsPerPage)  {
-
-
-    setLoading(true)
-    setError(false)
-   
-    servicePixabayAPI(nextQuery, nextPage, hitsPerPage)
-      .then(data => {
-        const { totalHits, hits } = data;
-  
-        if (!totalHits) {
-          setLoading(false)
-          setError(true)
-           toast.warn(
-            'Sorry, there are no images matching your search query. Please try again.'
+          const newData = hits.map(
+            ({ id, tags, webformatURL, largeImageURL }) => ({
+              id,
+              tags,
+              webformatURL,
+              largeImageURL,
+            })
           );
-          return;
-        }
-  
-        if (nextPage === 1 || totalHits <= hitsPerPage) {
-          toast.success(`Hooray! We found ${totalHits} images.`);
-        }
-  
-        const newData = hits.map(
-          ({ id, tags, webformatURL, largeImageURL }) => ({
-            id,
-            tags,
-            webformatURL,
-            largeImageURL,
-          })
-        );
-  
-        setGalleryItems(prevState => [...prevState, ...newData])
-        console.log(galleryPage < Math.ceil(totalHits / hitsPerPage.current))
-        console.log(galleryPage )
-        console.log( Math.ceil(totalHits / hitsPerPage))
-        console.log( totalHits)
-        console.log(  hitsPerPage)
 
+          setGalleryItems(prevState => [...prevState, ...newData]);
+          setIsButtonShow(
+            galleryPage < Math.ceil(totalHits / hitsPerPage.current)
+          );
+        })
+        .catch(error => {
+          console.error(error);
+          setLoading(false);
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
+          setError(false);
+        });
+    }
 
-        setIsButtonShow(galleryPage < Math.ceil(totalHits / hitsPerPage))
-       
-     
-      })
-      .catch(error => console.error(error))
-      .finally(()=> {
-        setLoading(false);
-        setError(false)}
-       
-      
-      );
+    fetchGalleryItems(searchQuery, galleryPage, hitsPerPage);
+  }, [searchQuery, galleryPage]);
+
+  const handlerSearchQuery = searchQuery => {
+    setSearchQuery(searchQuery);
+    setGalleryPage(1);
+    setGalleryItems([]);
+    setIsButtonShow(false);
   };
-
-  fetchGalleryItems(searchQuery, galleryPage, hitsPerPage)
-},[searchQuery, galleryPage, hitsPerPage])
-
-
-
- const handlerSearchQuery = searchQuery => {
-  setSearchQuery(searchQuery)
-  setGalleryPage(1)
-  setGalleryItems([])
-  setIsButtonShow(false)
-
- 
-  };
-
-
 
   const onLoadMore = () => {
-    setGalleryPage( prevState => prevState + 1)
- 
+    setGalleryPage(prevState => prevState + 1);
   };
-  
+
   return (
-      <AppContent>
-        <Searchbar formSubmitHandler={handlerSearchQuery}></Searchbar>
+    <AppContent>
+      <Searchbar formSubmitHandler={handlerSearchQuery}></Searchbar>
 
-        {error && <h2>Please, enter search word!</h2>}
-        {!error && <ImageGallery galleryItems={galleryItems} />}
-        {loading && <Loader />}
-        {isButtonShow && !loading && <Button onClick={onLoadMore} />}
+      {error && <h2>Please, enter search word!</h2>}
+      {!error && <ImageGallery galleryItems={galleryItems} />}
+      {loading && <Loader />}
+      {isButtonShow && !loading && !error && <Button onClick={onLoadMore} />}
 
-        <ToastContainer autoClose={3000} theme="dark" />
-      </AppContent>
-    );
+      <ToastContainer autoClose={3000} theme="dark" />
+    </AppContent>
+  );
 }
-
-
-//  class OldApp extends Component {
-//   state = {
-//     searchQuery: ``,
-//     galleryItems: [],
-//     galleryPage: 1,
-//     hitsPerPage: 12,
-
-//     loading: false,
-//     isButtonShow: false,
-//     error: true,
-//   };
-
-//   componentDidUpdate(_, prevState) {
-//     const { searchQuery: prevQuery, galleryPage: prevPage } = prevState;
-//     const {
-//       searchQuery: nextQuery,
-//       galleryPage: nextPage,
-//       hitsPerPage,
-//     } = this.state;
-
-//     if (prevQuery !== nextQuery || prevPage !== nextPage) {
-//       this.fetchGalleryItems(nextQuery, nextPage, hitsPerPage);
-//     }
-//   }
-
-//   fetchGalleryItems = (nextQuery, nextPage, hitsPerPage) => {
-//     this.setState({ loading: true, error: false });
-
-//     servicePixabayAPI(nextQuery, nextPage, hitsPerPage)
-//       .then(data => {
-//         const { totalHits, hits } = data;
-
-//         if (!totalHits) {
-//           this.setState({ loading: false, error: true });
-//           toast.warn(
-//             'Sorry, there are no images matching your search query. Please try again.'
-//           );
-//           return;
-//         }
-
-//         if (nextPage === 1 || totalHits <= hitsPerPage) {
-//           toast.success(`Hooray! We found ${totalHits} images.`);
-//         }
-
-//         const newData = hits.map(
-//           ({ id, tags, webformatURL, largeImageURL }) => ({
-//             id,
-//             tags,
-//             webformatURL,
-//             largeImageURL,
-//           })
-//         );
-
-//         this.setState(prevState => ({
-//           galleryItems: [...prevState.galleryItems, ...newData],
-//           isButtonShow:
-//             this.state.galleryPage < Math.ceil(totalHits / hitsPerPage),
-//         }));
-//       })
-//       .catch(error => console.error(error))
-//       .finally(
-//         this.setState({
-//           loading: false,
-//           error: false,
-//         })
-//       );
-//   };
-
-//   handlerSearchQuery = searchQuery => {
-//     this.setState({
-//       searchQuery: searchQuery,
-//       galleryPage: 1,
-//       galleryItems: [],
-//       isButtonShow: false,
-//     });
-//   };
-
-//   onLoadMore = () => {
-//     this.setState(prevState => ({
-//       galleryPage: prevState.galleryPage + 1,
-//     }));
-//   };
-
-//   render() {
-//     const { galleryItems, loading, isButtonShow, error } = this.state;
-
-//     return (
-//       <AppContent>
-//         <Searchbar formSubmitHandler={this.handlerSearchQuery}></Searchbar>
-
-//         {error && <h2>Please, enter search word!</h2>}
-//         {!error && <ImageGallery galleryItems={galleryItems} />}
-//         {loading && <Loader />}
-//         {isButtonShow && !loading && <Button onClick={this.onLoadMore} />}
-
-//         <ToastContainer autoClose={3000} theme="dark" />
-//       </AppContent>
-//     );
-//   }
-// }

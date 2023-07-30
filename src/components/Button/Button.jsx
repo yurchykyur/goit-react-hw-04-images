@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 
-
 import { ButtonLoad } from './Button.styled';
 
 export default function Button({ onClick }) {
