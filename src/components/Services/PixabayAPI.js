@@ -8,8 +8,6 @@ export default async function servicePixabayAPI(
 ) {
   const API_KEY = '36923827-7e58aafe5e36d67095a3a9316';
 
-  console.log('hitsPerPage', hitsPerPage);
-
   const config = {
     method: 'get',
     baseURL: 'https://pixabay.com/api/',
